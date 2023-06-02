@@ -209,14 +209,12 @@ static void* GFX_FlipThread(void* param) {
 				int had_low_battery = has_low_battery;
 				if (!battery_ticks || now-battery_ticks>=5000) {
 					battery_ticks = now;
-					char* path = "/tmp/battery";
-					int value = 0;
-					FILE *file = fopen(path, "r");
+					FILE *file = fopen("/tmp/battery", "r");
 					if (file!=NULL) {
-						fscanf(file, "%i", &value);
+						int value = 0;
+						if (fscanf(file, "%d", &value)==1) has_low_battery = value<=10;
 						fclose(file);
 					}
-					has_low_battery = value<=10;
 				}
 				if (has_low_battery || had_low_battery!=has_low_battery) update_battery = 1;
 			}
