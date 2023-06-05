@@ -92,6 +92,7 @@ unsigned char battery_pixels[] = {
 };
 unsigned int battery_pixels_len = 4480;
 
+static int no_rotate = 0;
 static int hide_battery = 0;
 static int has_low_battery = 0;
 static unsigned long battery_ticks = 0;
@@ -179,10 +180,9 @@ static void GFX_UpdateFlags(void) {
 
 	env = SDL_getenv("GFX_FLIPWAIT");
 	if (env && SDL_atoi(env)) flipFlags |= GFX_FLIPWAIT;
-	
+
 	env = SDL_getenv("SDL_HIDE_BATTERY");
 	if (env && SDL_atoi(env)) hide_battery = 1;
-	
 }
 
 //
@@ -391,9 +391,12 @@ static void	GFX_Init(void) {
 		stSrcRect.s32Xpos = 0;
 		stSrcRect.s32Ypos = 0;
 
+		const char* env = SDL_getenv("SDL_NO_ROTATE");
+		if (env && SDL_atoi(env)) no_rotate = 1;
+
 		memset(&stOpt, 0, sizeof(stOpt));
 		stOpt.eSrcDfbBldOp = E_MI_GFX_DFB_BLD_ONE;
-		stOpt.eRotate = E_MI_GFX_ROTATE_180;
+		stOpt.eRotate = no_rotate ? E_MI_GFX_ROTATE_0 : E_MI_GFX_ROTATE_180;
 
 		flip_mx = (pthread_mutex_t)PTHREAD_MUTEX_INITIALIZER;
 		flip_req = (pthread_cond_t)PTHREAD_COND_INITIALIZER;
