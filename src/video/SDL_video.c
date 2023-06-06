@@ -226,7 +226,7 @@ static void* GFX_FlipThread(void* param) {
 				uint32_t *dst_buffer = fb_addr + (vinfo.yoffset * 640 * sizeof(uint32_t));
 				if (has_low_battery) {
 					// draw low battery icon
-					uint32_t *src_buffer = battery_pixels;
+					uint32_t *src_buffer = (uint32_t*)battery_pixels;
 					dst_buffer += (640 * 432) + 8;
 					for (int y=0; y<40; y++) {
 						uint32_t *dst_buffer_row = dst_buffer;

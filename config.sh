@@ -1,14 +1,22 @@
 #!/bin/sh
+
+if [ ! -z "$MSETTINGS" ]; then
+	DEFINES="-DHAVE_LIBMSETTINGS"
+	LIBS="-lmi_sys -lmi_ao -lmi_gfx -lcam_os_wrapper -lmsettings"
+else
+	DEFINES=""
+	LIBS="-lmi_sys -lmi_ao -lmi_gfx -lcam_os_wrapper"
+fi
+
 export CC="${CROSS_COMPILE}gcc"
 export AR="${CROSS_COMPILE}gcc-ar"
 export RANLIB="${CROSS_COMPILE}gcc-ranlib"
-export CFLAGS="-O3 -flto"
-export CPPFLAGS=""
-export LDFLAGS=" -lmi_sys -lmi_ao -lmi_gfx -lcam_os_wrapper -Wl,--gc-sections"
-if [ ! -z "$MSETTINGS" ]; then
-	export CFLAGS="${CFLAGS} -DHAVE_LIBMSETTINGS"
-	export LDFLAGS="${LDFLAGS} -lmsettings"
-fi
+export CFLAGS="-O3 -marm -march=armv7ve+simd -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard\
+ -flto -fipa-pta -fipa-ra -ftree-vectorize -ffast-math -funsafe-math-optimizations\
+ -fno-math-errno -fno-unwind-tables -fno-asynchronous-unwind-tables\
+ -fdata-sections -ffunction-sections -Wl,--gc-sections ${DEFINES}"
+export LDFLAGS="${CFLAGS} ${LIBS}"
+export CPPFLAGS="${CFLAGS}"
 # NOTE: LIBS doesn't seem to be used so I had to put the libs in the LDFLAGS
 ./configure --host=arm-linux-gnueabihf\
  --enable-alsa=no\
